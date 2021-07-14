@@ -13,7 +13,7 @@ userSchema.methods.setPassword = function(password) {
     this.hashedValue = crypto.pbkdf2Sync(password, this.randomValue, 1000, 64, 'sha512').toString('hex');
   };
   
-  userSchema.methods.checkPassword = function(password) {
+  userSchema.methods.verifyPassword = function(password) {
     var hashedValue = crypto.pbkdf2Sync(password, this.randomValue, 1000, 64, 'sha512').toString('hex');
     return this.hashedValue == hashedValue;
   };

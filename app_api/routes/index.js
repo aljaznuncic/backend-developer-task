@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('passport');
 
 var ctrlAuthentication = require('../controllers/authentication');
 
-router.get('/', function (req, res) {
+router.get('/', passport.authenticate('basic', { session: false }), function (req, res) {
     console.log("On route '/'");
     res.send('Page Listing');
  });
