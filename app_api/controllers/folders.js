@@ -135,6 +135,7 @@ module.exports.folderDeleteSelected = function(request, response) {
 module.exports.folderReadAll = function(request, response) {
     Folder
         .find({authorId: request.user._id})
+        .sort(request.query.sort)
         .skip(parseInt(request.query.skip))
         .limit(parseInt(request.query.limit))
         .exec(function(error, folders) {

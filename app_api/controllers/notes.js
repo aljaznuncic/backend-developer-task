@@ -157,6 +157,7 @@ module.exports.noteDeleteSelected = function(request, response) {
 module.exports.noteReadAll = function(request, response) {
     Note
         .find({authorId: request.user._id})
+        .sort(request.query.sort)
         .skip(parseInt(request.query.skip))
         .limit(parseInt(request.query.limit))
         .exec(function(error, notes) {
