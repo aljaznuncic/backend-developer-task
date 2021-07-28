@@ -121,7 +121,7 @@ module.exports.folderDeleteSelected = function(request, response) {
                 return;
             }
             Folder
-                .findByIdAndRemove(request.body.folderId)
+                .findByIdAndRemove(request.params.folderId)
                 .exec(function(error, folder) {
                     if (error) {
                         returnJsonResponse(response, 404, error);

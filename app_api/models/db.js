@@ -4,7 +4,7 @@ var dbURI = 'mongodb://localhost/notesapi';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.DB_URI;
 }
-mongoose.connect(dbURI, { useNewUrlParser: true, useCreateIndex: true });
+mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: false});
 
 mongoose.connection.on('connected', function() {
   console.log('Mongoose is connected on ' + dbURI);
