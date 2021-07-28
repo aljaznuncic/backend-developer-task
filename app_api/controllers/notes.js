@@ -155,8 +155,12 @@ module.exports.noteDeleteSelected = function(request, response) {
 };
 
 module.exports.noteReadAll = function(request, response) {
+    // filterBy contains fields for which we want to have the option of filtering
+    const filterBy = ['folderId', 'shareOption', 'body'];
+    const filter = getFilter(request.query, filterBy);
+    filter['authorId'] = request.user._id;
     Note
-        .find({authorId: request.user._id})
+        .find(filter)
         .sort(request.query.sort)
         .skip(parseInt(request.query.skip))
         .limit(parseInt(request.query.limit))
@@ -168,3 +172,16 @@ module.exports.noteReadAll = function(request, response) {
             returnJsonResponse(response, 200, notes);
         });
 };
+
+function getFilter(query, fields) {
+    return fields.reduce((filter, field) => {
+  
+        if (query[field] !== undefined)
+            return {
+            ...filter,
+            [field]: query[field]
+        };
+  
+        return filter;
+    }, {});
+}
