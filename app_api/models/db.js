@@ -41,3 +41,4 @@ process.on('SIGINT', function() {
 
 require('./users');
 require('./folders');
+require('./notes')
