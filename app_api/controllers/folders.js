@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Folder = mongoose.model('Folder');
+var Note = mongoose.model('Note');
 
 var returnJsonResponse = function(response, status, content) {
     response.status(status);
@@ -120,14 +121,22 @@ module.exports.folderDeleteSelected = function(request, response) {
                 });
                 return;
             }
-            Folder
-                .findByIdAndRemove(request.params.folderId)
-                .exec(function(error, folder) {
+            Note
+                .remove({folderId: this._id}, function(error) {
                     if (error) {
                         returnJsonResponse(response, 404, error);
                         return;
                     }
-                    returnJsonResponse(response, 204, null);
+                    Folder
+                        .findByIdAndRemove(request.params.folderId)
+                        .exec(function(error, folder) {
+                            if (error) {
+                                returnJsonResponse(response, 404, error);
+                                return;
+                            }
+                            Note.remove({folderId: request.params.folderId}).exec();
+                            returnJsonResponse(response, 204, null);
+                        });
                 });
         });
 };

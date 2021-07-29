@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Note = mongoose.model('Note');
+var Folder = mongoose.model('Folder');
 
 var returnJsonResponse = function(response, status, content) {
     response.status(status);
@@ -13,28 +14,58 @@ module.exports.noteCreate = function(request, response) {
         });
         return;
     }
-    // Error from middleware
-    if (response.status(400)) {
-        returnJsonResponse(response, 404, {
-            "message": "I can't find a folder with the unique ID folderId."
-        });
-        return;
-    }
-        Note
-            .create({
-                name: request.body.name,
-                authorId: request.user._id,
-                folderId: request.body.folderId,
-                shareOption: request.body.shareOption,
-                type: request.body.type,
-                body: request.body.body
-            }, function(error, note) {
-                if (error) {
-                    returnJsonResponse(response, 400, error);
-                } else {
-                    returnJsonResponse(response, 201, note);
-                }
+    if (request.body.type == 'text') {
+        if(request.body.body.length > 1) {
+            returnJsonResponse(response, 400, {
+                "message": "Text note body array can contain a maximum of 1 element."
             });
+            return;
+        }
+    }
+    Folder
+        .findById(request.body.folderId)
+        .select('authorId')
+        .exec(function(error, folder) {
+            if(error) {
+                returnJsonResponse(response, 500, error);
+                return;
+            } else if(!folder) {
+                returnJsonResponse(response, 404, {
+                    "message": "I can't find a folder with the unique ID folderId."
+                });
+                return;
+            } else if(!folder.authorId.equals(request.user._id)) {
+                returnJsonResponse(response, 403, {
+                    "message": "You do not have permission to access the data."
+                });
+                return;
+            }
+            Note
+                .create({
+                    name: request.body.name,
+                    authorId: request.user._id,
+                    folderId: request.body.folderId,
+                    shareOption: request.body.shareOption,
+                    type: request.body.type,
+                    body: request.body.body
+                }, function(error, note) {
+                    if (error) {
+                        returnJsonResponse(response, 400, error);
+                    } else {
+                        Folder
+                            .countDocuments({_id: note.folderId}, function(error, count) {
+                                if (error || !count) {
+                                    note.remove();
+                                    returnJsonResponse(response, 400, {
+                                        "message": "file with fileId does not exist."
+                                    });
+                                    return;
+                                }
+                            });
+                        returnJsonResponse(response, 201, note);
+                    }
+                });
+        });
 };
 
 module.exports.noteReadSelected = function(request, response) {
@@ -78,42 +109,78 @@ module.exports.noteUpdateSelected = function(request, response) {
         });
         return;
     }
-    // Error from middleware
-    if (response.status(400)) {
-        returnJsonResponse(response, 404, {
-            "message": "I can't find a folder with the unique ID folderId."
+    if (!request.body || !request.body.name || !request.body.folderId || !request.body.type) {
+        returnJsonResponse(response, 400, {
+            "message": "Note name, folderId and type are required."
         });
         return;
     }
-    Note
-        .findById(request.params.noteId)
-        .exec(function(error, note) {
-            if (!note) {
-                returnJsonResponse(response, 404, {
-                    "message": "I can't find a note with the unique ID noteId."
-                });
-                return;
-            } else if (error) {
+    if (request.body.type == 'text') {
+        if(request.body.body.length > 1) {
+            returnJsonResponse(response, 400, {
+                "message": "Text note body array can contain a maximum of 1 element."
+            });
+            return;
+        }
+    }
+    Folder
+        .findById(request.body.folderId)
+        .select('authorId')
+        .exec(function(error, folder) {
+            if(error) {
                 returnJsonResponse(response, 500, error);
                 return;
-            } else if (!note.authorId.equals(request.user._id)) {
+            } else if(!folder) {
+                returnJsonResponse(response, 404, {
+                    "message": "I can't find a folder with the unique ID folderId."
+                });
+                return;
+            } else if(!folder.authorId.equals(request.user._id)) {
                 returnJsonResponse(response, 403, {
                     "message": "You do not have permission to access the data."
                 });
                 return;
             }
-            note.name = request.body.name;
-            note.folderId = request.body.folderId;
-            note.shareOption = request.body.shareOption;
-            note.type = request.body.type;
-            note.body = request.body.body;
-            note.save(function(error, note) {
-                if (error) {
-                    returnJsonResponse(response, 400, error);
-                } else {
-                    returnJsonResponse(response, 200, note);
-                }
-            });
+            Note
+                .findById(request.params.noteId)
+                .exec(function(error, note) {
+                    if (!note) {
+                        returnJsonResponse(response, 404, {
+                            "message": "I can't find a note with the unique ID noteId."
+                        });
+                        return;
+                    } else if (error) {
+                        returnJsonResponse(response, 500, error);
+                        return;
+                    } else if (!note.authorId.equals(request.user._id)) {
+                        returnJsonResponse(response, 403, {
+                            "message": "You do not have permission to access the data."
+                        });
+                        return;
+                    }
+                    note.name = request.body.name;
+                    note.folderId = request.body.folderId;
+                    note.shareOption = request.body.shareOption;
+                    note.type = request.body.type;
+                    note.body = request.body.body;
+                    note.save(function(error, note) {
+                        if (error) {
+                            returnJsonResponse(response, 400, error);
+                        } else {
+                            Folder
+                                .countDocuments({_id: note.folderId}, function(error, count) {
+                                    if (error || !count) {
+                                        note.remove();
+                                        returnJsonResponse(response, 400, {
+                                            "message": "file with fileId does not exist."
+                                        });
+                                        return;
+                                    }
+                                });
+                            returnJsonResponse(response, 200, note);
+                        }
+                    });
+                });
         });
 };
 
