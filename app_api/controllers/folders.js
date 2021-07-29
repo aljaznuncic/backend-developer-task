@@ -122,7 +122,7 @@ module.exports.folderDeleteSelected = function(request, response) {
                 return;
             }
             Note
-                .remove({folderId: this._id}, function(error) {
+                .deleteMany({folderId: this._id}, function(error) {
                     if (error) {
                         returnJsonResponse(response, 404, error);
                         return;
@@ -134,7 +134,7 @@ module.exports.folderDeleteSelected = function(request, response) {
                                 returnJsonResponse(response, 404, error);
                                 return;
                             }
-                            Note.remove({folderId: request.params.folderId}).exec();
+                            Note.deleteMany({folderId: request.params.folderId}).exec();
                             returnJsonResponse(response, 204, null);
                         });
                 });
