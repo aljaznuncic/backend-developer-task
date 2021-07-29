@@ -25,4 +25,7 @@ router.post('/notes', passport.authenticate('basic', { session: false }), ctrlNo
 router.put('/notes/:noteId', passport.authenticate('basic', { session: false }), ctrlNote.noteUpdateSelected);
 router.delete('/notes/:noteId', passport.authenticate('basic', { session: false }), ctrlNote.noteDeleteSelected);
 
+router.get('/sharedNotes', ctrlNote.sharedNoteReadAll);
+router.get('/sharedNotes/:noteId', ctrlNote.sharedNoteReadSelected);
+
 module.exports = router;

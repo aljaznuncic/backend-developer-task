@@ -240,6 +240,59 @@ module.exports.noteReadAll = function(request, response) {
         });
 };
 
+module.exports.sharedNoteReadSelected = function(request, response) {
+    if (request.params && request.params.noteId) {
+        if (!(/^\w+$/.test(request.params.noteId)) || Object.keys(request.query).length > 0) {
+            returnJsonResponse(response, 400, {
+                "message": "Wrong request"
+            });
+            return;
+        }
+        Note
+            .findById(request.params.noteId)
+            .exec(function(error, note) {
+                if (!note) {
+                    returnJsonResponse(response, 404, {
+                        "message": "I can't find a note with the unique ID noteId."
+                    });
+                    return;
+                } else if (error) {
+                    returnJsonResponse(response, 500, error);
+                    return;
+                } else if (note.shareOption != 'public') {
+                    returnJsonResponse(response, 403, {
+                        "message": "You do not have permission to access the data."
+                    });
+                    return;
+                }
+                returnJsonResponse(response, 200, note);
+            });
+    } else {
+        returnJsonResponse(response, 400, {
+            "message": "Missing unique ID noteId!"
+        });
+    }
+};
+
+module.exports.sharedNoteReadAll = function(request, response) {
+    // filterBy contains fields for which we want to have the option of filtering
+    const filterBy = ['folderId', 'body'];
+    const filter = getFilter(request.query, filterBy);
+    filter['shareOption'] = 'public';
+    Note
+        .find(filter)
+        .sort(request.query.sort)
+        .skip(parseInt(request.query.offset))
+        .limit(parseInt(request.query.limit))
+        .exec(function(error, notes) {
+            if (error) {
+                returnJsonResponse(response, 500, error);
+                return;
+            }
+            returnJsonResponse(response, 200, notes);
+        });
+};
+
 function getFilter(query, fields) {
     return fields.reduce((filter, field) => {
   
