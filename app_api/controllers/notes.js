@@ -229,7 +229,7 @@ module.exports.noteReadAll = function(request, response) {
     Note
         .find(filter)
         .sort(request.query.sort)
-        .skip(parseInt(request.query.skip))
+        .skip(parseInt(request.query.offset))
         .limit(parseInt(request.query.limit))
         .exec(function(error, notes) {
             if (error) {

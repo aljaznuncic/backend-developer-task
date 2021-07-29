@@ -145,7 +145,7 @@ module.exports.folderReadAll = function(request, response) {
     Folder
         .find({authorId: request.user._id})
         .sort(request.query.sort)
-        .skip(parseInt(request.query.skip))
+        .skip(parseInt(request.query.offset))
         .limit(parseInt(request.query.limit))
         .exec(function(error, folders) {
             if (error) {
