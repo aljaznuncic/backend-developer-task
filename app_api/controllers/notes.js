@@ -14,6 +14,12 @@ module.exports.noteCreate = function(request, response) {
         });
         return;
     }
+    if (!(/^\w+$/.test(request.body.folderId)) || Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
+        });
+        return;
+    }
     if (request.body.type == 'text') {
         if(request.body.body.length > 1) {
             returnJsonResponse(response, 400, {
@@ -115,6 +121,12 @@ module.exports.noteUpdateSelected = function(request, response) {
         });
         return;
     }
+    if (!(/^\w+$/.test(request.params.noteId)) || !(/^\w+$/.test(request.body.folderId)) || Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
+        });
+        return;
+    }
     if (request.body.type == 'text') {
         if(request.body.body.length > 1) {
             returnJsonResponse(response, 400, {
@@ -188,6 +200,12 @@ module.exports.noteDeleteSelected = function(request, response) {
     if (!request.params || !request.params.noteId) {
         returnJsonResponse(response, 400, {
             "message": "I can't find a note, noteId is missing."
+        });
+        return;
+    }
+    if (!(/^\w+$/.test(request.params.noteId)) || Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
         });
         return;
     }

@@ -14,6 +14,12 @@ module.exports.folderCreate = function(request, response) {
         });
         return;
     }
+    if (Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
+        });
+        return;
+    }
     Folder
         .create({
             name: request.body.name,
@@ -68,6 +74,12 @@ module.exports.folderUpdateSelected = function(request, response) {
         });
         return;
     }
+    if (!(/^\w+$/.test(request.params.folderId)) || Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
+        });
+        return;
+    }
     Folder
         .findById(request.params.folderId)
         .exec(function(error, folder) {
@@ -100,6 +112,12 @@ module.exports.folderDeleteSelected = function(request, response) {
     if (!request.params || !request.params.folderId) {
         returnJsonResponse(response, 400, {
             "message": "I can't find a folder, folderId is missing."
+        });
+        return;
+    }
+    if (!(/^\w+$/.test(request.params.folderId)) || Object.keys(request.query).length > 0) {
+        returnJsonResponse(response, 400, {
+            "message": "Wrong request"
         });
         return;
     }
