@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
-var Folder = mongoose.model('Folder')
+var Folder = mongoose.model('Folder');
 
 var noteSchema = new mongoose.Schema({
     name: {type: String, required: true},

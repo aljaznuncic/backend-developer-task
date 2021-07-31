@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
 var returnJsonResponse = function(response, status, content) {
-  response.status(status);
-  response.json(content);
+    response.status(status);
+    response.json(content);
 };
 
 module.exports.registration = function(request, response) {

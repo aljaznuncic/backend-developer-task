@@ -6,16 +6,16 @@ var userSchema = new mongoose.Schema({
     username: {type: String, required: true, unique: true},
     hashedValue: String,
     randomValue: String
-})
+});
 
 userSchema.methods.setPassword = function(password) {
     this.randomValue = crypto.randomBytes(16).toString('hex');
     this.hashedValue = crypto.pbkdf2Sync(password, this.randomValue, 1000, 64, 'sha512').toString('hex');
-  };
+};
   
-  userSchema.methods.verifyPassword = function(password) {
+userSchema.methods.verifyPassword = function(password) {
     var hashedValue = crypto.pbkdf2Sync(password, this.randomValue, 1000, 64, 'sha512').toString('hex');
     return this.hashedValue == hashedValue;
-  };
+};
 
-  mongoose.model('User', userSchema, 'Users');
+mongoose.model('User', userSchema, 'Users');
