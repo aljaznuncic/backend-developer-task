@@ -17,7 +17,7 @@ You can do this with command, dependent on shell, which you are using:
 * Mongosh
 
 ```bash
-mongosh "mongodb+srv://cluster0.uk2p3.mongodb.net/myFirstDatabase" --username aljaz --password fYtiP7ao94Xve9ZA
+mongosh "mongodb+srv://cluster0.uk2p3.mongodb.net/notesapi" --username aljaz --password fYtiP7ao94Xve9ZA
 ```
 
 * Mongo 3.6 or newer
@@ -30,7 +30,7 @@ mongo "mongodb+srv://cluster0.uk2p3.mongodb.net/notesapi" --username aljaz --pas
 
 ```bash
 mongo "mongodb://cluster0-shard-00-00.uk2p3.mongodb.net:27017,cluster0-shard-00-01.uk2p3.mongodb.net:27017,cluster0-shard-00-02.uk2p3.
-mongodb.net:27017/myFirstDatabase?replicaSet=Cluster0-shard-0" --ssl --authenticationDatabase admin --username aljaz --password fYtiP7ao94Xve9ZA
+mongodb.net:27017/notesapi?replicaSet=Cluster0-shard-0" --ssl --authenticationDatabase admin --username aljaz --password fYtiP7ao94Xve9ZA
 ```
 
 Then you just copy all text from the file [db-seed.txt](db-seed.txt) and paste it in shell.
